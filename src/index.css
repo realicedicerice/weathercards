@@ -1,0 +1,8 @@
+@font-face {
+  font-family: 'ReglisseFill';
+  src: url(./assets/ReglisseFill.otf);
+}
+
+.App, #root, body, html {
+  height: 100%;
+}

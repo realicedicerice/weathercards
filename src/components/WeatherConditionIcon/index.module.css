@@ -1,0 +1,11 @@
+.weatherConditionIcon {
+  display: block;
+}
+
+.weatherConditionIconBig {
+  height: 120px;
+}
+
+.weatherConditionIconSmall {
+  height: 70px;
+}

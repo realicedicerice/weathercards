@@ -39,7 +39,7 @@ const Search : React.FC = observer(() => {
       result = await weatherApi.search(q);
     } catch (e) {
       if (e instanceof NetworkError || e instanceof HTTPError) {
-        appStore.setOnNetworkError(true);
+        // appStore.setOnNetworkError(true);
 
         return;
       }
@@ -48,7 +48,7 @@ const Search : React.FC = observer(() => {
     }
 
     setOptions(result);
-  }, 200), [weatherApi, appStore]);
+  }, 200), [weatherApi]);
 
   const handleChange = (newLocation : ILocation | null) => {
     if (newLocation === null) {
@@ -79,7 +79,11 @@ const Search : React.FC = observer(() => {
 
       renderInput={(params) => <TextField
         {...params}
-        placeholder={appStore.location === null ? 'Location' : formatLocation(appStore.location)}
+        placeholder={
+          appStore.locationStore.location === null
+          ? 'Location'
+          : formatLocation(appStore.locationStore.location)
+        }
         InputLabelProps={{ shrink: true }}
       />}
       

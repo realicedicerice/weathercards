@@ -42,21 +42,21 @@ const ForecastDay : React.FC<ForecastDayProps> = ({ forecastDay }) => {
       </Grid>
 
       <Grid item container justifyContent='space-between' paddingX={2}>
-        <Grid item fontWeight={700}>
+        <Grid item fontWeight={700} component={Typography}>
           Hi
         </Grid>
 
-        <Grid item>
+        <Grid item component={Typography}>
           {formatTemperature(forecastDay.day.maxtemp_c)}
         </Grid>
       </Grid>
 
       <Grid item container justifyContent='space-between' paddingX={2}>
-        <Grid item fontWeight={700}>
+        <Grid item fontWeight={700} component={Typography}>
           Lo
         </Grid>
 
-        <Grid item>
+        <Grid item component={Typography}>
           {formatTemperature(forecastDay.day.mintemp_c)}
         </Grid>
       </Grid>

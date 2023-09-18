@@ -3,6 +3,8 @@ import React from 'react';
 
 import classNames from 'classnames';
 
+import { useTheme } from '@mui/material/styles';
+
 import { ReactComponent as WiCloudy } from '../../assets/svg/wi-cloudy.svg';
 import { ReactComponent as WiFog } from '../../assets/svg/wi-fog.svg';
 import { ReactComponent as WiShowers } from '../../assets/svg/wi-showers.svg';
@@ -154,6 +156,8 @@ const IconDispatcher : React.FC<IconDispatcherProps> = ({ conditionCode, isDay, 
 }
 
 const WeatherConditionIcon : React.FC<WeatherConditionIconProps> = ({ conditionCode, isDay, variant }) => {
+  const theme = useTheme();
+  
   return (
     <IconDispatcher
       conditionCode={conditionCode}
@@ -162,6 +166,7 @@ const WeatherConditionIcon : React.FC<WeatherConditionIconProps> = ({ conditionC
         [styles.weatherConditionIconSmall] : variant === 'small',
         [styles.weatherConditionIconBig] : variant === 'big',
       })}
+      fill={theme.palette.primary.main}
     />
   );
 }

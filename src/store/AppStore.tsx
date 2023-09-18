@@ -4,88 +4,66 @@ import { ICurrent } from '../interfaces/ICurrent';
 import { ILocation } from '../interfaces/ILocation';
 import { IForecastDay } from '../interfaces/IForecastDay';
 
-import { WeatherApi } from '../api/WeatherApi';
-
 import { NetworkError } from '../errors/NetworkError';
 import { HTTPError } from '../errors/HTTPError';
+
+import { AppStoreEnv } from './AppStoreEnv';
+
+import { CurrentWeatherStore } from './CurrentWeatherStore';
+import { LocationStore } from './LocationStore';
+import { ForecastStore } from './ForecastStore';
+import { ThemeStore } from './ThemeStore';
 
 const AppStore = 
   types
     .model({
-      location : types.maybeNull(types.frozen<ILocation>()),
-
-      currentWeather : types.maybeNull(types.frozen<ICurrent>()),
-
-      forecast : types.maybeNull(types.frozen<Array<IForecastDay>>()),
-
       onNetworkError : types.optional(types.boolean, false),
+
+      currentWeatherStore : types.optional(CurrentWeatherStore, () => CurrentWeatherStore.create({})),
+
+      locationStore : types.optional(LocationStore, () => LocationStore.create({})),
+
+      forecastStore : types.optional(ForecastStore, () => ForecastStore.create({})),
+
+      themeStore: types.optional(ThemeStore, () => ThemeStore.create({})),
     })
     .actions((self) => {
-      const setLocation = (newLocation : ILocation | null) => {
-        self.location = newLocation;
-
-        getCurrentWeather();
-
-        getForecast();
-      }
-
       const setOnNetworkError = (state : boolean) => {
         self.onNetworkError = state;
       }
 
-      const getCurrentWeather = flow(function *() {
-        if (self.location === null) {
-          self.currentWeather = null;
+      const setLocation = flow(function *(location : ILocation | null) {
+        self.locationStore.setLocation(location);
 
+        yield update();
+      });
+
+      const getCurrentWeather = flow(function *() {
+        if (self.locationStore.location === null) {
           return;
         }
+        
+        const { location, current } = yield self.currentWeatherStore.getCurrentWeather(
+          self.locationStore.location
+        );
 
-        try {
-          const { current, location } : {
-            current : ICurrent,
-            location : ILocation,
-          } = yield getEnv<AppStoreEnv>(self).weatherApi.current(
-            `${self.location.lat},${self.location.lon}`,
-          );
+        self.locationStore.setLocation(location);
 
-          self.currentWeather = current;
-          self.location = location;
-        } catch (e) {
-          if (e instanceof NetworkError || e instanceof HTTPError) {
-            setOnNetworkError(true);
-
-            return;
-          }
-
-          throw e;
-        }
+        self.themeStore.setCurrentWeather(current);
       });
 
       const getForecast = flow(function *() {
-        if (self.location === null) {
-          self.forecast = null;
-
+        if (self.locationStore.location === null) {
           return;
         }
 
-        let forecast;
+        yield self.forecastStore.getForecast(self.locationStore.location);
+      });
 
-        try {
-          forecast = yield getEnv<AppStoreEnv>(self).weatherApi.forecast(
-            `${self.location.lat},${self.location.lon}`,
-            3,
-          );
-        } catch (e) {
-          if (e instanceof NetworkError || e instanceof HTTPError) {
-            setOnNetworkError(true);
+      const update = flow(function *() {
+        yield getCurrentWeather();
 
-            return;
-          }
-
-          throw e;
-        }
-
-        self.forecast = forecast;
+        yield getForecast();
       });
 
       return {
@@ -93,14 +71,11 @@ const AppStore =
         getCurrentWeather,
         getForecast,
         setOnNetworkError,
+        update,
       }
     });
 
 
 export interface IAppStore extends Instance<typeof AppStore> {}
-
-export interface AppStoreEnv {
-  weatherApi : WeatherApi
-}
 
 export { AppStore }

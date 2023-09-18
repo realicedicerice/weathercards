@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
-import { autorun } from 'mobx';
+import { reaction } from 'mobx';
 
 import { useAppStore } from '../../hooks/useAppStore';
 
 import { getPaletteByCondition } from '../../util/getPaletteByCondition';
 
-import { ICurrent } from '../../interfaces/ICurrent';
-
 import styles from './index.module.css';
 
 const Background : React.FC = () => {
-  const appStore = useAppStore();
+  const { currentWeatherStore } = useAppStore();
 
-  const [currentWeather, setCurrentWeather] = useState<ICurrent | null>(null);
   const [parity, setParity] = useState<number>(0);
   const [background, setBackground] = useState<Array<string>>([
     '#FFFFFF',
@@ -21,16 +18,18 @@ const Background : React.FC = () => {
   ]);
 
   useEffect(() => {
-    return autorun(() => {
-      if (JSON.stringify(appStore.currentWeather) !== JSON.stringify(currentWeather)) {
+
+    return reaction(
+      () => currentWeatherStore.currentWeather,
+      (currentWeather) => {
         const newBackground = [...background];
 
-        if (appStore.currentWeather === null) {
+        if (currentWeather === null) {
           newBackground[parity ^ 1] = '#FFFFFF';
         } else {
           const palette = getPaletteByCondition(
-            appStore.currentWeather.condition.code,
-            appStore.currentWeather.is_day === 1
+            currentWeather.condition.code,
+            currentWeather.is_day === 1
           );
 
           newBackground[parity ^ 1] = `linear-gradient(
@@ -42,11 +41,11 @@ const Background : React.FC = () => {
         }
 
         setBackground(newBackground);
-        setCurrentWeather(appStore.currentWeather);
         setParity(parity ^ 1);
-      }
-    });
-  }, [appStore, currentWeather, parity, background]);
+      },
+    );
+
+  }, [currentWeatherStore, parity, background]);
 
 
   return (

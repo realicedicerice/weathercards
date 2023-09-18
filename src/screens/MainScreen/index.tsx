@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+
+import { observer } from 'mobx-react-lite';
 
 import Grid from '@mui/material/Grid';
 
@@ -15,10 +17,21 @@ import { ErrorAlert } from '../../features/ErrorAlert';
 import { MainButtons } from './components/MainButtons';
 import { MainTopBar } from './components/MainTopBar';
 
+import { useAppStore } from '../../hooks/useAppStore';
+
+import { MainScreenStore } from './store';
+
 import styles from './index.module.css';
 
-const MainScreen : React.FC = () => {
+const MainScreen : React.FC = observer(() => {
   const [swiper, setSwiper] = useState<SwiperClass | null>(null);
+
+  const appStore = useAppStore();
+
+  const mainScreenStore = useMemo(
+    () => new MainScreenStore(appStore),
+    [appStore],
+  );
 
   return (
     <>
@@ -29,7 +42,7 @@ const MainScreen : React.FC = () => {
       <Grid container direction='column' sx={{ height: '100%', position: 'relative', zIndex: 1 }}>
 
         <Grid item>
-          <MainTopBar />
+          <MainTopBar mainScreenStore={mainScreenStore} />
         </Grid>
 
         <Grid item sx={{ position: 'absolute', top: '50%', left: '0', right: '0', transform: 'translateY(-50%)' }}>
@@ -60,6 +73,6 @@ const MainScreen : React.FC = () => {
       </Grid>
     </>
   );
-}
+});
 
 export { MainScreen }

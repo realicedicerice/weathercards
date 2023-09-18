@@ -15,8 +15,14 @@ import { useAppStore } from '../../hooks/useAppStore';
 
 import { formatTemperature } from '../../util/formatTemperature';
 
+import { useTheme } from '@mui/material';
+
+import styles from './index.module.css';
+
 const CurrentWeather : React.FC = observer(() => {
   const { currentWeatherStore } = useAppStore();
+
+  const theme = useTheme();
 
   return currentWeatherStore.currentWeather === null ? (
     <>
@@ -34,7 +40,18 @@ const CurrentWeather : React.FC = observer(() => {
         </Grid>
 
         <Grid item>
-          <Typography sx={{ fontSize: '7em' }} lineHeight={1} fontFamily='ReglisseFill'>
+          <Typography
+            sx={{
+              fontSize: '7em',
+              '--gradient1': theme.palette.gradient1.main,
+              '--gradient2': theme.palette.gradient2.main,
+              '--primary': theme.palette.primary.main,
+              '--overlay': `${theme.palette.primary.main}22`,
+              fontFamily: 'ReglisseFill',
+            }}
+            lineHeight={1}
+            className={styles.temperatureLabel}
+          >
             {formatTemperature(currentWeatherStore.currentWeather.temp_c)}
           </Typography>
           <Typography sx={{ fontSize: '1.3em' }} lineHeight={1}>
@@ -42,22 +59,26 @@ const CurrentWeather : React.FC = observer(() => {
           </Typography>
         </Grid>
 
-        <Grid item container justifyContent='center'>
-          <Grid item xs={4}>
+        <Grid item container justifyContent='space-evenly'>
+          <Grid item>
             <Typography lineHeight={4} fontWeight={500}>
-              <WiUmbrella style={{display: 'inline-block', height: '40px', verticalAlign: 'middle'}}/>
+              <WiUmbrella
+                fill={theme.palette.primary.main}
+                style={{display: 'inline-block', height: '40px', verticalAlign: 'middle'}}/>
               {currentWeatherStore.currentWeather.precip_mm} mm
             </Typography>
           </Grid>
 
-          <Grid item xs={3}>
+          <Grid item>
             <Typography lineHeight={4} fontWeight={500}>
-              <WiHumidity style={{display: 'inline-block', height: '40px', verticalAlign: 'middle'}}/>
+              <WiHumidity 
+                fill={theme.palette.primary.main}
+                style={{display: 'inline-block', height: '40px', verticalAlign: 'middle'}}/>
               {currentWeatherStore.currentWeather.humidity}%
             </Typography>
           </Grid>
 
-          <Grid item xs={5}>
+          <Grid item>
             <Typography lineHeight={4} fontWeight={500}>
               <WiWindDeg
                 style={{
@@ -66,6 +87,7 @@ const CurrentWeather : React.FC = observer(() => {
                   verticalAlign: 'middle', 
                   transform: `rotate(${currentWeatherStore.currentWeather.wind_degree}deg)`
                 }}
+                fill={theme.palette.primary.main}
               />
               {currentWeatherStore.currentWeather.wind_kph} km/h              
             </Typography>

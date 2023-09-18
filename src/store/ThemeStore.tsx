@@ -35,6 +35,12 @@ const ThemeStore =
             secondary: {
               main: palette.primary,
             },
+            gradient1: {
+              main: palette.gradient1,
+            },
+            gradient2: {
+              main: palette.gradient2,
+            },
           },
           typography: {
             allVariants: {

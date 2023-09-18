@@ -14,7 +14,7 @@ import { ReactComponent as WiSleet } from '../../assets/svg/wi-sleet.svg';
 import { ReactComponent as WiThunderstorm } from '../../assets/svg/wi-thunderstorm.svg';
 import { ReactComponent as WiRain } from '../../assets/svg/wi-rain.svg';
 import { ReactComponent as WiHail } from '../../assets/svg/wi-hail.svg';
-import { ReactComponent as WiLightning } from '../../assets/svg/wi-lightning.svg';
+// import { ReactComponent as WiLightning } from '../../assets/svg/wi-lightning.svg';
 
 import { ReactComponent as WiDaySunny } from '../../assets/svg/wi-day-sunny.svg';
 import { ReactComponent as WiDayCloudy } from '../../assets/svg/wi-day-cloudy.svg';
@@ -44,45 +44,55 @@ import styles from './index.module.css';
 
 interface WeatherConditionIconProps {
   conditionCode : number,
-  isDay : boolean,
-  variant : 'big' | 'small',
+  variant : 'day' | 'night' | 'universal',
+  size : 'big' | 'small',
 }
 
 interface IconDispatcherProps extends React.SVGProps<SVGSVGElement> {
   conditionCode : number,
-  isDay : boolean,
+  variant : 'day' | 'night' | 'universal',
 }
 
-const IconDispatcher : React.FC<IconDispatcherProps> = ({ conditionCode, isDay, ...props }) => {
+const IconDispatcher : React.FC<IconDispatcherProps> = ({ conditionCode, variant, ...props }) => {
+  function ByVariant (
+    Day : React.FC<React.SVGProps<SVGSVGElement>>,
+    Night : React.FC<React.SVGProps<SVGSVGElement>>,
+    Universal : React.FC<React.SVGProps<SVGSVGElement>>,
+  ) {
+    if (variant === 'day') return <Day {...props} />;
+    if (variant === 'night') return <Night {...props} />;
+    return <Universal {...props} />;
+  }
+
   switch (conditionCode) {
     // 1000 - Sunny / Clear
-    case 1000: return isDay ? <WiDaySunny {...props} /> : <WiNightClear {...props} />;
+    case 1000: return ByVariant(WiDaySunny, WiNightClear, WiCloudy);
     // 1003 - Partly Cloudy / Partly Cloudy
     case 1003:
     // 1006 - Cloudy / Cloudy
-    case 1006: return isDay ? <WiDayCloudy {...props} /> : <WiNightAltCloudy {...props} />;
+    case 1006: return ByVariant(WiDayCloudy, WiNightAltCloudy, WiCloudy);
     // 1009 - Overcast / Overcast
-    case 1009: return <WiCloudy {...props} />;
+    case 1009: return ByVariant(WiCloudy, WiCloudy, WiCloudy);
     // 1030 - Mist / Mist
-    case 1030: return <WiFog {...props} />; 
+    case 1030: return ByVariant(WiDayFog, WiNightFog, WiFog); 
     // 1063 - Patchy rain nearby / Patchy rain nearby 
-    case 1063: return <WiShowers {...props} />;
+    case 1063: return ByVariant(WiDayShowers, WiNightShowers, WiShowers);
     // 1066 - Patchy snow nearby / Patchy snow nearby
-    case 1066: return <WiSnow {...props} />;
+    case 1066: return ByVariant(WiDaySnow, WiNightSnow, WiSnow);
     // 1069 - Patchy sleet nearby / Patchy sleet nearby
-    case 1069: return <WiSleet {...props} />;
+    case 1069: 
     // 1072 - Patchy freezing drizzle nearby / Patchy freezing drizzle nearby
-    case 1072: return <WiSleet {...props} />;
+    case 1072: return ByVariant(WiDaySleet, WiNightSleet, WiSleet);
     // 1087 - Thundery outbreaks in nearby / Thundery outbreaks in nearby
-    case 1087: return <WiThunderstorm {...props} />;
+    case 1087: return ByVariant(WiDayThunderstorm, WiNightThunderstorm, WiThunderstorm);
     // 1114 - Blowing snow / Blowing snow == 
-    case 1114: return <WiSnowWind {...props} />;
+    case 1114:
     // 1117 - Blizzard / Blizzard == 
-    case 1117: return <WiSnowWind {...props} />;
+    case 1117: return ByVariant(WiDaySnowWind, WiNightSnowWind, WiSnowWind);
     // 1135 - Fog / Fog
-    case 1135: return <WiFog {...props} />; 
+    case 1135:
     // 1147 - Freezing fog / Freezing fog
-    case 1147: return <WiFog {...props} />; 
+    case 1147: return ByVariant(WiDayFog, WiNightFog, WiFog); 
     // 1150 - Patchy light drizzle / Patchy light drizzle
     case 1150:
     // 1153 - Light drizzle / Light drizzle
@@ -106,11 +116,11 @@ const IconDispatcher : React.FC<IconDispatcherProps> = ({ conditionCode, isDay, 
     // 1198 - Light freezing rain / Light freezing rain
     case 1198: 
     // 1201 - Moderate or heavy freezing rain / Moderate or heavy freezing rain
-    case 1201: return <WiRain {...props} />;
+    case 1201: return ByVariant(WiDayRain, WiNightRain, WiRain);
     // 1204 - Light sleet / Light sleet
-    case 1204: return <WiSleet {...props} />;
+    case 1204:
     // 1207 - Moderate or heavy sleet / Moderate or heavy sleet
-    case 1207: return <WiSleet {...props} />;
+    case 1207: return ByVariant(WiDaySleet, WiNightSleet, WiSleet);
     // 1210 - Patchy light snow / Patchy light snow
     case 1210:
     // 1213 - Light snow / Light snow
@@ -122,49 +132,49 @@ const IconDispatcher : React.FC<IconDispatcherProps> = ({ conditionCode, isDay, 
     // 1222 - Patchy heavy snow / Patchy heavy snow
     case 1222:
     // 1225 - Heavy snow / Heavy snow
-    case 1225: return <WiSnow {...props} />;
+    case 1225: return ByVariant(WiDaySnow, WiNightSnow, WiSnow);
     // 1237 - Ice pellets / Ice pellets
-    case 1237: return <WiHail {...props} />;
+    case 1237: return ByVariant(WiDayHail, WiNightHail, WiHail);
     // 1240 - Light rain shower / Light rain shower
     case 1240: 
     // 1243 - Moderate or heavy rain shower / Moderate or heavy rain shower --
     case 1243:
     // 1246 - Torrential rain shower / Torrential rain shower
-    case 1246: return <WiShowers{...props} />;
+    case 1246: return ByVariant(WiDayShowers, WiNightShowers, WiShowers);
     // 1249 - Light sleet showers / Light sleet showers
     case 1249:
     // 1252 - Moderate or heavy sleet showers / Moderate or heavy sleet showers
-    case 1252: return <WiSleet {...props} />;
+    case 1252: return ByVariant(WiDaySleet, WiNightSleet, WiSleet);
     // 1255 - Light snow showers / Light snow showers
     case 1255:
     // 1258 - Moderate or heavy snow showers / Moderate or heavy snow showers
-    case 1258: return <WiSnow {...props} />;
+    case 1258: return ByVariant(WiDaySnow, WiNightSnow, WiSnow);
     // 1261 - Light showers of ice pellets / Light showers of ice pellets == 
     case 1261:
     // 1264 - Moderate or heavy showers of ice pellets / Moderate or heavy showers of ice pellets
-    case 1264: return <WiHail {...props} />;
+    case 1264: return ByVariant(WiDayHail, WiNightHail, WiHail);
     // 1273 - Patchy light rain in area with thunder / Patchy light rain in area with thunder
     case 1273:
     // 1276 - Moderate or heavy rain in area with thunder / Moderate or heavy rain in area with thunder
-    case 1276: return <WiThunderstorm {...props} />;
+    case 1276: return ByVariant(WiDayThunderstorm, WiNightThunderstorm, WiThunderstorm);
     // 1279 - Patchy light snow in area with thunder / Patchy light snow in area with thunder
     case 1279:
     // 1282 - Moderate or heavy snow in area with thunder / Moderate or heavy snow in area with thunder
-    case 1282: return <WiDaySnowThunderstorm {...props} />;
-    default: return <WiDaySunny {...props} />
+    case 1282: return ByVariant(WiDaySnowThunderstorm, WiNightSnowThunderstorm, WiThunderstorm);
+    default: return ByVariant(WiCloudy, WiCloudy, WiCloudy);
   }
 }
 
-const WeatherConditionIcon : React.FC<WeatherConditionIconProps> = ({ conditionCode, isDay, variant }) => {
+const WeatherConditionIcon : React.FC<WeatherConditionIconProps> = ({ conditionCode, variant, size }) => {
   const theme = useTheme();
   
   return (
     <IconDispatcher
       conditionCode={conditionCode}
-      isDay={isDay}
+      variant={variant}
       className={classNames(styles.weatherConditionIcon, {
-        [styles.weatherConditionIconSmall] : variant === 'small',
-        [styles.weatherConditionIconBig] : variant === 'big',
+        [styles.weatherConditionIconSmall] : size === 'small',
+        [styles.weatherConditionIconBig] : size === 'big',
       })}
       fill={theme.palette.primary.main}
     />

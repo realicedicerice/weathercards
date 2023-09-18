@@ -30,8 +30,8 @@ const ForecastDay : React.FC<ForecastDayProps> = ({ forecastDay }) => {
       <Grid item>
         <WeatherConditionIcon
           conditionCode={forecastDay.day.condition.code}
-          isDay={true}
-          variant='small'
+          variant='universal'
+          size='small'
         />
       </Grid>
 

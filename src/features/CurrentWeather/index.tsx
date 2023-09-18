@@ -28,8 +28,8 @@ const CurrentWeather : React.FC = observer(() => {
         <Grid item position='absolute' marginBottom={46}>
           <WeatherConditionIcon
             conditionCode={currentWeatherStore.currentWeather.condition.code}
-            isDay={currentWeatherStore.currentWeather.is_day === 1}
-            variant='big'
+            variant={currentWeatherStore.currentWeather.is_day === 1 ? 'day' : 'night'}
+            size='big'
           />
         </Grid>
 

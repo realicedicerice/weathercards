@@ -5,9 +5,9 @@ import { observer } from 'mobx-react-lite';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 
-import { ReactComponent as WiHumidity } from '../../assets/svg/wi-humidity.svg';
-import { ReactComponent as WiUmbrella } from '../../assets/svg/wi-umbrella.svg';
-import { ReactComponent as WiWindDeg } from '../../assets/svg/wi-wind-deg.svg';
+import WiHumidity from '../../assets/svg/wi-humidity.svg?react';
+import WiUmbrella from '../../assets/svg/wi-umbrella.svg?react';
+import WiWindDeg from '../../assets/svg/wi-wind-deg.svg?react';
 
 import { WeatherConditionIcon } from '../../components/WeatherConditionIcon';
 

@@ -33,21 +33,19 @@ const Search : React.FC = observer(() => {
       return;
     }
 
-    let result;
-
     try {
-      result = await weatherApi.search(q);
-    } catch (e) {
-      if (e instanceof NetworkError || e instanceof HTTPError) {
-        // appStore.setOnNetworkError(true);
+      const result = await weatherApi.search(q);
+
+      setOptions(result);
+    } catch (error) {
+      if (error instanceof NetworkError || error instanceof HTTPError) {
+        appStore.setOnNetworkError(true);
 
         return;
       }
 
-      throw e;
+      throw error;
     }
-
-    setOptions(result);
   }, 200), [weatherApi]);
 
   const handleChange = (newLocation : ILocation | null) => {

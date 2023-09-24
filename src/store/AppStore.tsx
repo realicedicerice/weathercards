@@ -1,13 +1,9 @@
-import { Instance, types, flow, getEnv } from 'mobx-state-tree';
+import { Instance, types, flow } from 'mobx-state-tree';
 
-import { ICurrent } from '../interfaces/ICurrent';
 import { ILocation } from '../interfaces/ILocation';
-import { IForecastDay } from '../interfaces/IForecastDay';
 
 import { NetworkError } from '../errors/NetworkError';
 import { HTTPError } from '../errors/HTTPError';
-
-import { AppStoreEnv } from './AppStoreEnv';
 
 import { CurrentWeatherStore } from './CurrentWeatherStore';
 import { LocationStore } from './LocationStore';
@@ -43,13 +39,24 @@ const AppStore =
           return;
         }
         
-        const { location, current } = yield self.currentWeatherStore.getCurrentWeather(
-          self.locationStore.location
-        );
+        try {
+          const {
+            location,
+            current
+          } = yield self.currentWeatherStore.getCurrentWeather(
+            self.locationStore.location
+          );
 
-        self.locationStore.setLocation(location);
-
-        self.themeStore.setCurrentWeather(current);
+          self.locationStore.setLocation(location);
+  
+          self.themeStore.setCurrentWeather(current);
+        } catch (error) {
+          if (error instanceof NetworkError || error instanceof HTTPError) {
+            setOnNetworkError(true);
+          } else {
+            throw error;
+          }
+        }
       });
 
       const getForecast = flow(function *() {
@@ -57,7 +64,15 @@ const AppStore =
           return;
         }
 
-        yield self.forecastStore.getForecast(self.locationStore.location);
+        try {
+          yield self.forecastStore.getForecast(self.locationStore.location);
+        } catch (error) {
+          if (error instanceof NetworkError || error instanceof HTTPError) {
+            setOnNetworkError(true);
+          } else {
+            throw error;
+          }
+        }
       });
 
       const update = flow(function *() {
